@@ -1,47 +1,7 @@
 import { FETCH_SHOPPING_LIST, DELETE_SHOPPING_LIST, ADD_SHOPPING_LIST } from './index';
+import data from './db/shoppingList.json';
 
-const shoppingListItems = [
-    {
-        id: 0,
-        name: 'Pure Gold',
-        type: 'Gorcery',
-        itemCount: 10,
-        itemList: [
-            {
-                name: 'milk',
-                count: 1
-            },
-            {
-                name: 'coffee',
-                count: 12
-            },
-            {
-                name: 'Eggs',
-                count: 12
-            },
-        ]
-    },
-    {
-        id: 1,
-        name: 'Pure Silver',
-        type: 'Gorcery',
-        itemCount: 10,
-        itemList: [
-            {
-                name: 'milk',
-                count: 1
-            },
-            {
-                name: 'coffee',
-                count: 12
-            },
-            {
-                name: 'Eggs',
-                count: 12
-            },
-        ]
-    }
-]
+const shoppingListItems = data;
 
 export const actionGetShoppingList = () => {
     return({

@@ -25,7 +25,8 @@ const MainContainer = styled('div')({
 });
 
 const PageCard = styled('div')({
-  border: '1px solid #ccc',
+  background: '#fff',
+  boxShadow: '0px 0px 5px 3px #ccc',
   borderRadius: '15px',
   width: 1280,
   padding: '0 20px'

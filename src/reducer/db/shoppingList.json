@@ -1,0 +1,62 @@
+[
+    {
+        "id": 0,
+        "name": "Pure Gold",
+        "type": "Gorcery",
+        "itemCount": 10,
+        "itemList": [
+            {
+                "name": "milk",
+                "count": 1
+            },
+            {
+                "name": "coffee",
+                "count": 12
+            },
+            {
+                "name": "Eggs",
+                "count": 12
+            }
+        ]
+    },
+    {
+        "id": 1,
+        "name": "Pure Silver",
+        "type": "Hardware",
+        "itemCount": 5,
+        "itemList": [
+            {
+                "name": "milk",
+                "count": 1
+            },
+            {
+                "name": "coffee",
+                "count": 12
+            },
+            {
+                "name": "Eggs",
+                "count": 12
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Pure Bronze",
+        "type": "Home Goods",
+        "itemCount": 12,
+        "itemList": [
+            {
+                "name": "milk",
+                "count": 1
+            },
+            {
+                "name": "coffee",
+                "count": 12
+            },
+            {
+                "name": "Eggs",
+                "count": 12
+            }
+        ]
+    }
+]

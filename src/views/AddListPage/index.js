@@ -1,97 +1,39 @@
 import React, {useState} from 'react';
-import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import { useCustomContext } from '../../reducer/customContext';
 import { actionAddShoppingList } from '../../reducer/reducerActions';
 
 import Text from '../../components/Text';
 import Icon from '../../components/Icon';
+import {
+    Container,
+    FormContainer,
+    FormElem,
+    FlexContainer,
+    FormInput,
+    InputLabel,
+    FormDropdown,
+    ListHeader,
+    RedSpan,
+    FormButton
+} from './styleComponents';
 
 import dragIcon from '../../assets/dragIcon.png';
 import deleteIcon from '../../assets/delete.png';
 import plusIcon from '../../assets/plus.png';
 
-const Container = styled('div')({
-    display: 'flex',
-    flexDirection: 'column'
-});
-
-const FormContainer = styled('div')({
-    display: 'flex',
-    padding: 15,
-    width: '1024px',
-    margin: '0 auto'
-});
-
-const FormElem = styled('form')({
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%'
-})
-
-const FlexContainer = styled('div')(({ isColumn, isParent, isBtn }) => ({
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: isColumn ? 'column' : 'row',
-    justifyContent: isParent ? 'space-between' : isBtn ? 'flex-end' : 'unset',
-    width: isParent ? '100%' : 'unset'
-}))
-
-const FormInput = styled('input')(({ isOnForm }) => ({
-    width: isOnForm ? '100%' : '500px',
-    margin: isOnForm ? '4px 5px' : 0,
-    height: 30,
-    fontSize: 24
-}));
-
-const InputLabel = styled(Text)({
-    fontSize: 18,
-    fontWeight: '700'
-});
-
-const FormDropdown = styled('select')(({ isOnForm }) => ({
-    width: isOnForm ? 400 : 300,
-    margin: isOnForm ? '4px 5px' : 0,
-    height: 35,
-    fontSize: 24,
-    textAlign: isOnForm ? 'center' : 'unset'
-}));
-
-const ListHeader = styled('div')({
-    display: 'flex',
-    height: 40,
-    width: '100%',
-    margin: '15px 0',
-    justifyContent: 'space-around',
-    boxShadow: '0px 2px 3px 4px #ccc'
-})
-
-const RedSpan = styled('span')({
-    color: 'red'
-})
-
-const FormButton = styled('input')(({ isSave }) => ({
-    fontSize: 18,
-    fontWeight: 700,
-    width: 90,
-    height: 40,
-    margin: '0 10px',
-    cursor: 'pointer',
-    boxShadow: '1px 1px 3px 3px #ccc',
-    border: 'none',
-    background: isSave ? '#b4e3ff' : ''
-}));
-
 // ADD LIST PAGE COMPONENT
 const AddListPage = () => {
-    const navigate = useNavigate();
-    const {state, dispatch} = useCustomContext();
-    const [shoppingState, setShoppingState] = useState({
+    const navigate = useNavigate(); // for navigating pages via router-dom
+    const {state, dispatch} = useCustomContext(); // get the store reducer
+    const [shoppingState, setShoppingState] = useState({ // initialize our state object to use on our shopping list items
         name: '',
         type: '',
         itemList: [
             {
+                id: '0',
                 name: '',
                 count: 1
             }
@@ -105,11 +47,13 @@ const AddListPage = () => {
     }
 
     const handleAddItem = () => {
+        let id = shoppingState.itemList.length.toString();
         setShoppingState({
             ...shoppingState,
             itemList: [
                 ...shoppingState.itemList,
                 {
+                    id: id,
                     name: '',
                     count: 1
                 }
@@ -118,14 +62,18 @@ const AddListPage = () => {
     }
 
     const handleRemoveItem = i => {
-        console.log(i)
         let temp = {...shoppingState};
         temp.itemList.splice(i, 1);
-
         setShoppingState(temp);
     }
 
-    const handleOnSubmit = () => {
+    const handleOnSubmit = e => {
+        if(shoppingState.itemList.length < 1) { // cancel submission condition
+            window.alert('Please add atleast 1 item')
+            e.preventDefault();
+            return false;
+        }
+
         let newState = {...state};
         newState.shoppingList.push({
             ...shoppingState,
@@ -133,24 +81,43 @@ const AddListPage = () => {
             itemCount: shoppingState.itemList.length
         })
 
-        dispatch(actionAddShoppingList(newState));
+        dispatch(actionAddShoppingList(newState)); // update the data to our reducer store
         window.alert('Shopping List Saved!');
-        navigate('/')
+        navigate('/') // then go back to main page
     }
 
-    const setOptionsQuantity = () => {
+    const setOptionsQuantity = () => { // render dropdown contents for quantity
         const rows = [];
-        for(let i=0; i<12; i++) {
-            rows.push(<option value={i+1}>{i+1}</option>)
-        }
-        return <>{rows}</>
+        for(let i=0; i<12; i++) rows.push(<option value={i+1}>{i+1}</option>)
+        return (
+            <>
+                <option disabled selected value='' hidden></option>
+                {rows}
+            </>
+        )
+    }
+
+    const onDragEnd = event => { // Sort the data after drop event on dnd
+        const {source, destination, type} = event;
+
+        // prunings
+        if(!destination) return;
+        if(source.index === destination.index) return;
+
+        // reordering logic and updating our state data
+        const sourceIndex = source.index;
+        const destinationIndex = destination.index;
+        const reorderedList = shoppingState;
+        const [itemToMove] = reorderedList.itemList.splice(sourceIndex, 1); // get the data on array that we will be moving
+        reorderedList.itemList.splice(destinationIndex, 0, itemToMove); // store it again but this time on the target index
+        setShoppingState(reorderedList); // then update our state
     }
 
     return (
         <Container>
             <h1>Create your Shopping List</h1>
             <FormContainer>
-                <FormElem target="_blank" onSubmit={handleOnSubmit}>
+                <FormElem target="_blank" onSubmit={e => handleOnSubmit(e)}>
                     <FlexContainer isParent>
                         <FlexContainer isColumn>
                             <InputLabel fontFamily={'cursive'}>Shopping List Name <RedSpan>*</RedSpan></InputLabel>
@@ -171,16 +138,33 @@ const AddListPage = () => {
                         <Text size={24} fontWeight='700'>Item Name</Text>
                         <Text size={24} fontWeight='700'>Quantity</Text>
                     </ListHeader>
-                    {shoppingState.itemList && shoppingState.itemList.map((val, index) => (
-                        <FlexContainer isParent>
-                                <Icon src={dragIcon} isBtn/>
-                                <FormInput isOnForm required type='text' name='name' value={val.name} onChange={e => handleFieldOnChange(e, index)}/>
-                                <FormDropdown isOnForm required name='count' onChange={e => handleFieldOnChange(e, index)}>
-                                    {setOptionsQuantity()}
-                                </FormDropdown>
-                                <Icon width={40} height={28} src={deleteIcon} onClick={() => handleRemoveItem(index)}/>
+
+                    {/* React beatiful DnD library */}
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <FlexContainer>
+                            <Droppable droppableId='ROOT'>{/* droppable element can be multiple. Note that Ids should be on string */}
+                                {provided => (
+                                    <FlexContainer isParent isColumn ref={provided.innerRef} {...provided.droppableProps}>
+                                        {shoppingState.itemList && shoppingState.itemList.map((val, index) => (
+                                            <Draggable draggableId={val.id} key={val.id} index={index}>
+                                                {provided => (
+                                                    <FlexContainer isParent {...provided.dragHandleProps} {...provided.draggableProps} ref={provided.innerRef}>
+                                                        <Icon src={dragIcon} isBtn/>
+                                                        <FormInput isOnForm required type='text' name='name' value={val.name} onChange={e => handleFieldOnChange(e, index)}/>
+                                                        <FormDropdown isOnForm required name='count' onChange={e => handleFieldOnChange(e, index)}>
+                                                            {setOptionsQuantity()}
+                                                        </FormDropdown>
+                                                        <Icon isBtn width={40} height={28} src={deleteIcon} onClick={() => handleRemoveItem(index)}/>
+                                                    </FlexContainer>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </FlexContainer>
+                                )}
+                            </Droppable>
                         </FlexContainer>
-                    ))}
+                    </DragDropContext>
 
                     <Icon height={35} width={35} margin='10px auto' src={plusIcon} isBtn onClick={handleAddItem} />
                     <FlexContainer isBtn>
