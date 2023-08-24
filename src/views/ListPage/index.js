@@ -24,27 +24,28 @@ import deleteIcon from '../../assets/delete.png';
 
 const ListPage = () => {
     const {state, dispatch} = useCustomContext();
+    const { shoppingList, isLoaded } = state;
 
-    const deleteCard = id => {
-        const newVal = shoppingList.filter(val => {
-            return val.id !== id;
-        });
+    const deleteCard = index => {
+        console.log('LALA ID ', index);
+        let temp = shoppingList;
+        temp.splice(index, 1);
+        console.log('LALA ', temp);
 
-        dispatch(actionDeleteShoppingItem(newVal));
+        dispatch(actionDeleteShoppingItem(temp));
     }
 
-    const { shoppingList, isLoaded } = state;
     return (
         <Container>
             <h1>List of Created Shoppings</h1>
             <CardContainer>
                 {
-                    isLoaded && shoppingList.map(val => (
-                        <Card key={val.id}>
+                    isLoaded && shoppingList.map((val, index) => (
+                        <Card key={index}>
                             <CardHeader>
                                 <CardInitial bgColor={`#${Math.floor(Math.random()*16777215).toString(16)}`}>{val.name.charAt(0).toUpperCase()}</CardInitial> {/* with randomize color BG */}
                                 <Text size={18} fontFamily={'cursive'} color='#5e5e5e' margin='0 0 0 10px' fontWeight='700'>{val.name}</Text>
-                                <CardDelete src={deleteIcon} onClick={() => deleteCard(val.id)} />
+                                <CardDelete src={deleteIcon} onClick={() => deleteCard(index)} />
                             </CardHeader>
                             <CardDetail>
                                 <Icon src={shopType} margin='0 10px 0 0'/>
